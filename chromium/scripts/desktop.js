@@ -4,6 +4,9 @@ let lastUrl = location.href;
 let checkerHasBeenCalled = false;
 let showPanelHasBeenCalled = false;
 
+let checkerHasBeenCalledStory = false;
+let showPanelHasBeenCalledStory = false;
+
 new MutationObserver(() => {
   if (location.href !== lastUrl) {
     lastUrl = location.href;
@@ -13,6 +16,14 @@ new MutationObserver(() => {
     const old_panel = document.querySelector('#vkVideoDownloaderPanel');
     if (old_panel !== null) {
       old_panel.remove();
+    }
+
+    checkerHasBeenCalledStory = false;
+    showPanelHasBeenCalledStory = false;
+    
+    const old_panel_story = document.querySelector('#vkStoryDownloaderPanel');
+    if (old_panel_story !== null) {
+      old_panel_story.remove();
     }
   }
 
@@ -25,7 +36,7 @@ new MutationObserver(() => {
       if (!showPanelHasBeenCalled && document.querySelector('#video_player video')) {
         showPanelHasBeenCalled = true;
         clearInterval(checker);
-        showDownloadPanel();
+        showDownloadPanel('scripts/desktop-injection.js');
       } else if (!showPanelHasBeenCalled && document.querySelector('#video_player iframe')) {
         showPanelHasBeenCalled = true;
         clearInterval(checker);
@@ -33,13 +44,25 @@ new MutationObserver(() => {
       }
     }, 500);
   }
+  if (
+    /w=story/.test(location.search) && !checkerHasBeenCalledStory
+  ) {
+    checkerHasBeenCalledStory = true;
+    const storyChecker = setInterval(() => {
+      if (!showPanelHasBeenCalledStory && document.querySelector('#stories_list video')) {
+        showPanelHasBeenCalledStory = true;
+        clearInterval(storyChecker);
+        showDownloadPanel('scripts/desktop-story-injection.js');
+      }
+    }, 500);
+  }
 }).observe(document.body, { subtree: true, childList: true });
 
-function showDownloadPanel() {
+function showDownloadPanel(url) {
   const script = document.createElement('script');
   script.charset = 'utf-8';
   script.type = 'text/javascript';
-  script.src = chrome.runtime.getURL('scripts/desktop-injection.js');
+  script.src = chrome.runtime.getURL(url);
   document.body.appendChild(script);
 }
 

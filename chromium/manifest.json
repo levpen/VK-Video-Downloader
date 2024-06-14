@@ -24,6 +24,10 @@
     {
       "resources": ["scripts/mobile-injection.js"],
       "matches": ["https://m.vk.com/*"]
+    },
+    {
+      "resources": ["scripts/desktop-story-injection.js"],
+      "matches": ["https://vk.com/*"]
     }
   ],
   "icons": {
